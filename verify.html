@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#24594d">
+    <title>Check Information · Registration Form Scanner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/verify.js"></script>
+  </head>
+  <body>
+    <header class="topbar compact">
+      <div class="shell brand-row">
+        <div class="brand-mark" aria-hidden="true">RF</div>
+        <div><p class="eyebrow">Registration Form Scanner</p><h1>Check the information</h1></div>
+      </div>
+    </header>
+    <main class="shell page-stack narrow">
+      <nav class="steps" aria-label="Progress">
+        <span class="step done"><b>✓</b> Upload</span>
+        <span class="step done"><b>✓</b> Scan</span>
+        <span class="step active"><b>3</b> Check</span>
+        <span class="step"><b>4</b> Submit</span>
+      </nav>
+      <section class="intro-card simple">
+        <div><p class="eyebrow accent">Manual check required</p><h2>Please review every field</h2><p>Handwriting OCR can make mistakes. Correct anything that does not match the paper form.</p></div>
+      </section>
+      <form id="verification-form" class="verification-form" novalidate>
+        <div id="verification-fields"></div>
+        <section id="warning-panel" class="alert warning" hidden aria-live="polite"></section>
+        <div class="sticky-actions">
+          <a class="button secondary" href="index.html">Scan Again</a>
+          <button id="submit-button" class="button primary" type="submit">Confirm & Submit</button>
+        </div>
+      </form>
+      <section id="debug-panel" class="debug-panel" hidden>
+        <div class="section-title"><p class="eyebrow">Developer mode</p><h2>Calibration & OCR details</h2></div>
+        <div id="debug-content"></div>
+      </section>
+    </main>
+    <dialog id="submit-dialog" class="progress-dialog">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Saving confirmed information…</h2>
+      <p>Please keep this page open.</p>
+    </dialog>
+  </body>
+</html>

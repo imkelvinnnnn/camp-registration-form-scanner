@@ -1,0 +1,13 @@
+# Never commit completed registration photos or exported personal data.
+completed-forms/
+test-photos/
+exports/
+*.csv
+*.xlsx
+
+# Local editor and operating-system files.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/

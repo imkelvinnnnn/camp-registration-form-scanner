@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#24594d">
+    <title>Registration Form Scanner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="shell brand-row">
+        <div class="brand-mark" aria-hidden="true">RF</div>
+        <div>
+          <p class="eyebrow">Internal tool</p>
+          <h1>Registration Form Scanner</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell page-stack">
+      <nav class="steps" aria-label="Progress">
+        <span class="step active"><b>1</b> Upload</span>
+        <span class="step"><b>2</b> Scan</span>
+        <span class="step"><b>3</b> Check</span>
+        <span class="step"><b>4</b> Submit</span>
+      </nav>
+
+      <section class="intro-card">
+        <div>
+          <p class="eyebrow accent">Two-page form</p>
+          <h2>Take clear photos of both pages</h2>
+          <p>The photos are processed on this device. Nothing is sent to Google Sheets until you check the information and press Confirm.</p>
+        </div>
+        <ul class="photo-tips">
+          <li>Place the form on a flat surface</li>
+          <li>Show the whole page and all four corners</li>
+          <li>Hold the phone directly above the form</li>
+          <li>Avoid shadows, glare and blurry handwriting</li>
+        </ul>
+      </section>
+
+      <form id="upload-form" class="upload-grid" novalidate>
+        <section class="upload-card" data-page="1">
+          <div class="card-heading">
+            <span class="page-badge">Page 1</span>
+            <div>
+              <h2>Student & Contact Information</h2>
+              <p>报名表格</p>
+            </div>
+          </div>
+          <label class="file-drop" for="page1-file">
+            <span class="camera-icon" aria-hidden="true">＋</span>
+            <strong>Take Photo / Upload</strong>
+            <small>JPG or PNG</small>
+          </label>
+          <input id="page1-file" class="visually-hidden" type="file" accept="image/png,image/jpeg" capture="environment" required>
+          <div class="preview-wrap" id="page1-preview-wrap" hidden>
+            <img id="page1-preview" alt="Page 1 photo preview">
+            <button class="text-button" type="button" data-change="page1-file">Change photo</button>
+          </div>
+        </section>
+
+        <section class="upload-card" data-page="2">
+          <div class="card-heading">
+            <span class="page-badge">Page 2</span>
+            <div>
+              <h2>Parent Consent</h2>
+              <p>家长同意书</p>
+            </div>
+          </div>
+          <label class="file-drop" for="page2-file">
+            <span class="camera-icon" aria-hidden="true">＋</span>
+            <strong>Take Photo / Upload</strong>
+            <small>JPG or PNG</small>
+          </label>
+          <input id="page2-file" class="visually-hidden" type="file" accept="image/png,image/jpeg" capture="environment" required>
+          <div class="preview-wrap" id="page2-preview-wrap" hidden>
+            <img id="page2-preview" alt="Page 2 photo preview">
+            <button class="text-button" type="button" data-change="page2-file">Change photo</button>
+          </div>
+        </section>
+
+        <div class="form-actions full-width">
+          <p id="upload-error" class="alert error" role="alert" hidden></p>
+          <button id="process-button" class="button primary" type="submit">Process Both Pages</button>
+        </div>
+      </form>
+    </main>
+
+    <dialog id="progress-dialog" class="progress-dialog">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Reading registration form…</h2>
+      <p id="progress-message">Preparing the photos.</p>
+      <progress id="progress-bar" value="0" max="100">0%</progress>
+      <strong id="progress-percent">0%</strong>
+    </dialog>
+  </body>
+</html>
