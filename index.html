@@ -37,6 +37,7 @@
         <ul class="photo-tips">
           <li>Place the form on a flat surface</li>
           <li>Show the whole page and all four corners</li>
+          <li>Adjust the four crop handles after uploading</li>
           <li>Hold the phone directly above the form</li>
           <li>Avoid shadows, glare and blurry handwriting</li>
         </ul>
@@ -89,6 +90,23 @@
         </div>
       </form>
     </main>
+
+    <dialog id="crop-dialog" class="crop-dialog" aria-labelledby="crop-title">
+      <div class="crop-heading">
+        <p id="crop-step" class="eyebrow accent">Page 1 of 2</p>
+        <h2 id="crop-title">Set the four corners for Page 1</h2>
+        <p id="crop-message">Drag handles 1–4 onto the four corners of the paper.</p>
+      </div>
+      <div class="crop-stage">
+        <canvas id="crop-canvas" aria-label="Photo crop editor"></canvas>
+      </div>
+      <div class="crop-actions">
+        <button id="crop-cancel" class="button secondary" type="button">Cancel</button>
+        <button id="crop-reset" class="button secondary" type="button">Reset Corners</button>
+        <button id="crop-back" class="button secondary" type="button" hidden>Back</button>
+        <button id="crop-next" class="button primary" type="button">Next: Crop Page 2</button>
+      </div>
+    </dialog>
 
     <dialog id="progress-dialog" class="progress-dialog">
       <div class="spinner" aria-hidden="true"></div>

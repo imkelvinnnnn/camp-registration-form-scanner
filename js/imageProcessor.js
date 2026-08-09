@@ -29,7 +29,7 @@ function bitmapToCanvas(bitmap) {
   return canvas;
 }
 
-export async function normalizePagesInWorker(page1File, page2File, onProgress = () => {}, timeoutMs = 180000) {
+export async function normalizePagesInWorker(page1File, page2File, pageCorners, onProgress = () => {}, timeoutMs = 180000) {
   if (!window.Worker || !window.createImageBitmap) {
     throw new Error("This browser is too old for background image processing. Please use a current version of Chrome, Edge, Firefox, or Safari.");
   }
@@ -84,8 +84,8 @@ export async function normalizePagesInWorker(page1File, page2File, onProgress = 
       type: "process-pages",
       maxPhotoSide: APP_CONFIG.maxPhotoSide,
       pages: [
-        { page: 1, buffer: page1Buffer, mimeType: page1File.type || "image/jpeg" },
-        { page: 2, buffer: page2Buffer, mimeType: page2File.type || "image/jpeg" },
+        { page: 1, buffer: page1Buffer, mimeType: page1File.type || "image/jpeg", corners: pageCorners?.[0] },
+        { page: 2, buffer: page2Buffer, mimeType: page2File.type || "image/jpeg", corners: pageCorners?.[1] },
       ],
     }, [page1Buffer, page2Buffer]);
   });

@@ -171,14 +171,26 @@ function fullImageCorners(src) {
   ];
 }
 
-function normalizeMat(engine, src) {
+function normalizedManualCorners(points, src) {
+  if (!Array.isArray(points) || points.length !== 4) return null;
+  if (!points.every((point) => Number.isFinite(point?.x) && Number.isFinite(point?.y))) return null;
+  return points.map((point) => ({
+    x: Math.max(0, Math.min(src.cols - 1, point.x * (src.cols - 1))),
+    y: Math.max(0, Math.min(src.rows - 1, point.y * (src.rows - 1))),
+  }));
+}
+
+function normalizeMat(engine, src, selectedCorners) {
   const ratio = src.cols / src.rows;
   const expectedRatio = TARGET_SIZE.width / TARGET_SIZE.height;
   // A tightly cropped template or scanner export is already page-shaped. Running
   // contour detection on it can mistake the large student table for the page edge.
-  let corners = Math.abs(ratio - expectedRatio) <= 0.012
-    ? fullImageCorners(src)
-    : findDocumentCorners(engine, src);
+  let corners = normalizedManualCorners(selectedCorners, src);
+  if (!corners) {
+    corners = Math.abs(ratio - expectedRatio) <= 0.012
+      ? fullImageCorners(src)
+      : findDocumentCorners(engine, src);
+  }
   if (!corners) {
     if (Math.abs(ratio - expectedRatio) > 0.18) {
       throw new Error("We could not clearly detect the form. Please retake the photo with all four page corners visible.");
@@ -278,7 +290,7 @@ async function processPage(engine, page, progress, maxPhotoSide) {
   }
   try {
     report(progress.detect, `Detecting Page ${page.page} edges…`);
-    const normalized = normalizeMat(engine, src);
+    const normalized = normalizeMat(engine, src, page.corners);
     report(progress.normalized, `Page ${page.page} straightened.`);
     return normalized;
   } finally {

@@ -5,6 +5,7 @@ A simple, mobile-friendly, two-page fixed-template form scanner. It runs OCR and
 ## What is included
 
 - Phone camera or JPG/PNG upload for exactly two form pages.
+- Touch-friendly four-corner crop review for both pages before processing.
 - Page-edge detection, perspective correction, rotation correction, and normalization to 1440 × 2048.
 - Bundled OpenCV running inside a Web Worker, keeping the upload page responsive.
 - Fixed field crops derived from the supplied blank templates.
@@ -33,6 +34,7 @@ registration-form-scanner/
 ├── css/style.css
 ├── js/
 │   ├── app.js
+│   ├── cropper.js
 │   ├── extractor.js
 │   ├── imageProcessor.js
 │   ├── opencv-worker.js
@@ -71,6 +73,8 @@ Then open:
 ```text
 http://localhost:8000
 ```
+
+After selecting both photos, press **Process Both Pages**. For each page, drag handles `1`, `2`, `3`, and `4` onto the paper's top-left, top-right, bottom-right, and bottom-left corners. Keep the table or floor outside the green outline, then continue. The selected quadrilateral is perspective-corrected to 1440 × 2048 before field extraction.
 
 For the calibration overlay:
 

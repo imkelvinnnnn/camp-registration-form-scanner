@@ -39,3 +39,19 @@ test("does not mistake an internal form table for the page boundary", async () =
   assert.match(worker, /Math\.abs\(ratio - expectedRatio\) <= 0\.012/);
   assert.match(worker, /fullImageCorners\(src\)/);
 });
+
+test("uses mobile four-corner cropping before page normalization", async () => {
+  const [html, app, cropper, client, worker] = await Promise.all([
+    read("index.html"),
+    read("js/app.js"),
+    read("js/cropper.js"),
+    read("js/imageProcessor.js"),
+    read("js/opencv-worker.js"),
+  ]);
+  assert.match(html, /id="crop-canvas"/);
+  assert.match(app, /requestPageCorners/);
+  assert.match(cropper, /pointerdown/);
+  assert.match(cropper, /isValidQuadrilateral/);
+  assert.match(client, /corners: pageCorners\?\.\[0\]/);
+  assert.match(worker, /normalizedManualCorners\(selectedCorners, src\)/);
+});

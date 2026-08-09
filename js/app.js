@@ -1,4 +1,5 @@
 import { nextPaint, normalizePagesInWorker } from "./imageProcessor.js";
+import { requestPageCorners } from "./cropper.js";
 import { extractForms } from "./extractor.js";
 import { saveScan, saveTemporaryImage } from "./storage.js";
 
@@ -54,13 +55,19 @@ form.addEventListener("submit", async (event) => {
 
   errorBox.hidden = true;
   processButton.disabled = true;
-  progressDialog.showModal();
-  setProgress(1, "Starting background image processor…");
   try {
+    const pageCorners = await requestPageCorners([page1File, page2File]);
+    if (!pageCorners) {
+      processButton.disabled = false;
+      return;
+    }
+    progressDialog.showModal();
+    setProgress(1, "Starting background image processor…");
     await nextPaint();
     const { page1Canvas, page2Canvas } = await normalizePagesInWorker(
       page1File,
       page2File,
+      pageCorners,
       ({ percent, label }) => setProgress(percent ?? progressBar.value, label),
     );
 
@@ -75,7 +82,7 @@ form.addEventListener("submit", async (event) => {
     setProgress(100, "Ready for your review.");
     window.location.href = `verify.html${new URLSearchParams(window.location.search).get("debug") === "true" ? "?debug=true" : ""}`;
   } catch (error) {
-    progressDialog.close();
+    if (progressDialog.open) progressDialog.close();
     errorBox.textContent = error.message || "The form could not be processed. Please try clearer photos.";
     errorBox.hidden = false;
     errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
