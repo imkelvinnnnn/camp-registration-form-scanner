@@ -39,7 +39,7 @@ For a row whose top anchor is `T`:
 | Field | Coordinates |
 | --- | --- |
 | Chinese name | `194, 1167, 300, 60` |
-| English name | `675, 1167, 692, 60` |
+| English name | `760, 1167, 607, 60` |
 | Mobile | `194, 1233, 478, 60` |
 | Home telephone | `836, 1233, 531, 60` |
 | Email | `194, 1300, 1173, 59` |

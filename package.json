@@ -1,6 +1,6 @@
 {
   "name": "internal-registration-form-scanner",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "description": "Browser-only fixed-template registration form scanner for GitHub Pages.",

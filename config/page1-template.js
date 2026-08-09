@@ -37,7 +37,7 @@ export const PAGE1_TEMPLATE = Object.freeze({
   })),
   guardian: {
     chineseName: { x: 194, y: 1167, width: 300, height: 60, type: "chinese", psm: 7 },
-    englishName: { x: 675, y: 1167, width: 692, height: 60, type: "english", psm: 7 },
+    englishName: { x: 760, y: 1167, width: 607, height: 60, type: "english", psm: 7 },
     mobile: { x: 194, y: 1233, width: 478, height: 60, type: "phone", psm: 7 },
     homePhone: { x: 836, y: 1233, width: 531, height: 60, type: "phone", psm: 7 },
     email: { x: 194, y: 1300, width: 1173, height: 59, type: "email", psm: 7 },

@@ -14,11 +14,26 @@ function luminance(data, offset) {
   return data[offset] * 0.299 + data[offset + 1] * 0.587 + data[offset + 2] * 0.114;
 }
 
+function medianLuminance(data) {
+  const histogram = new Uint32Array(256);
+  for (let offset = 0; offset < data.length; offset += 4) {
+    histogram[Math.max(0, Math.min(255, Math.round(luminance(data, offset))))] += 1;
+  }
+  const midpoint = data.length / 8;
+  let counted = 0;
+  for (let value = 0; value < histogram.length; value += 1) {
+    counted += histogram[value];
+    if (counted >= midpoint) return value;
+  }
+  return 255;
+}
+
 export function extraInkRatio(photoCanvas, blankCanvas, region) {
   const photo = cropCanvas(photoCanvas, region);
   const blank = cropCanvas(blankCanvas, region);
   const photoData = photo.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, photo.width, photo.height).data;
   const blankData = blank.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, blank.width, blank.height).data;
+  const inkThreshold = Math.max(75, Math.min(175, medianLuminance(photoData) - 35));
   const width = photo.width;
   const height = photo.height;
   let extraDark = 0;
@@ -47,20 +62,48 @@ export function extraInkRatio(photoCanvas, blankCanvas, region) {
 }
 
 export function detectMark(photoCanvas, blankCanvas, region) {
-  const ratio = extraInkRatio(photoCanvas, blankCanvas, region);
-  if (ratio >= 0.014) return { state: "selected", ratio };
-  if (ratio <= 0.0035) return { state: "not-selected", ratio };
+  const photo = cropCanvas(photoCanvas, region);
+  const blank = cropCanvas(blankCanvas, region);
+  const photoData = photo.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, photo.width, photo.height).data;
+  const blankData = blank.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, blank.width, blank.height).data;
+  const marginX = Math.max(3, Math.round(photo.width * 0.22));
+  const marginY = Math.max(3, Math.round(photo.height * 0.22));
+  let ink = 0;
+  let inspected = 0;
+  for (let y = marginY; y < photo.height - marginY; y += 1) {
+    for (let x = marginX; x < photo.width - marginX; x += 1) {
+      const index = (y * photo.width + x) * 4;
+      const photoLum = luminance(photoData, index);
+      const blankLum = luminance(blankData, index);
+      if (photoLum < inkThreshold && blankLum > 185 && blankLum - photoLum > 24) ink += 1;
+      inspected += 1;
+    }
+  }
+  const ratio = ink / Math.max(1, inspected);
+  if (ratio >= 0.018) return { state: "selected", ratio };
+  if (ratio <= 0.008) return { state: "not-selected", ratio };
   return { state: "needs-review", ratio };
+}
+
+export function chooseExclusiveFromRatios(ratios) {
+  const ranked = Object.entries(ratios).sort((first, second) => second[1] - first[1]);
+  if (!ranked.length || ranked[0][1] <= 0.008) return "";
+  const [topChoice, topRatio] = ranked[0];
+  const secondRatio = ranked[1]?.[1] || 0;
+  if (topRatio >= 0.015 && topRatio - secondRatio >= 0.006 && topRatio >= secondRatio * 1.45) {
+    return topChoice;
+  }
+  return "Needs Review";
 }
 
 export function detectExclusiveGroup(photoCanvas, blankCanvas, choices) {
   const details = Object.fromEntries(
     Object.entries(choices).map(([value, region]) => [value, detectMark(photoCanvas, blankCanvas, region)]),
   );
-  const selected = Object.entries(details).filter(([, result]) => result.state === "selected").map(([value]) => value);
-  const uncertain = Object.values(details).some((result) => result.state === "needs-review");
   return {
-    value: selected.length === 1 ? selected[0] : selected.length > 1 || uncertain ? "Needs Review" : "",
+    value: chooseExclusiveFromRatios(Object.fromEntries(
+      Object.entries(details).map(([value, result]) => [value, result.ratio]),
+    )),
     details,
   };
 }

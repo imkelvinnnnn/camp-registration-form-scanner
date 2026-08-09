@@ -249,7 +249,8 @@ async function renderDebug() {
     card.append(element("h3", "", item.label));
     card.append(cropCanvas(canvases[item.page - 1], item.region));
     const details = document.createElement("dl");
-    [["Result", item.result || "(blank)"], ["Confidence", `${Math.round(item.confidence)}%`], ["Extra ink", `${(item.inkRatio * 100).toFixed(2)}%`]].forEach(([name, value]) => {
+    const inkLabel = item.kind === "mark" ? "Center ink" : "Extra ink";
+    [["Result", item.result || "(blank)"], ["Confidence", `${Math.round(item.confidence)}%`], [inkLabel, `${(item.inkRatio * 100).toFixed(2)}%`]].forEach(([name, value]) => {
       details.append(element("dt", "", name), element("dd", "", value));
     });
     card.append(details);
@@ -259,6 +260,12 @@ async function renderDebug() {
 }
 
 renderForm();
+if (scan.ocrWarnings?.length) {
+  showWarnings(
+    scan.ocrWarnings.map((item) => `${item.label} was read with ${item.confidence}% confidence.`),
+    "Some handwriting could not be read confidently. Compare these fields with the paper form.",
+  );
+}
 renderDebug().catch((error) => showWarnings([], `Debug view error: ${error.message}`));
 
 form.addEventListener("input", () => {

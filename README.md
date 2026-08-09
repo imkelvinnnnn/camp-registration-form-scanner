@@ -10,7 +10,7 @@ A simple, mobile-friendly, two-page fixed-template form scanner. It runs OCR and
 - Bundled OpenCV running inside a Web Worker, keeping the upload page responsive.
 - Fixed field crops derived from the supplied blank templates.
 - Browser OCR through Tesseract.js (`chi_sim+eng`).
-- Circle/tick detection by comparing each known circle with the blank template.
+- Circle/tick detection using center-ink analysis and relative scoring within exclusive groups.
 - Signature-presence detection without attempting to read the signature.
 - Editable verification for students, guardian, consent, parent response, and office use.
 - Fee calculation warning that does not block correction or submission.
@@ -19,6 +19,8 @@ A simple, mobile-friendly, two-page fixed-template form scanner. It runs OCR and
 - No Laravel, Python server, database, accounts, Docker, or paid hosting.
 
 Handwritten Chinese and cursive English remain difficult for Tesseract. This application deliberately treats human verification as mandatory. It does not promise perfect handwriting recognition.
+
+The local OCR preprocessing removes printed template lines before recognition and flags results below 55% confidence. For substantially better handwriting recognition, replace Tesseract with a handwriting-capable server or cloud vision model. Doing so changes the current privacy model because completed form images would leave the device.
 
 ## Project structure
 

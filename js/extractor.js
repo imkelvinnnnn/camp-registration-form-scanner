@@ -30,6 +30,7 @@ function prettifyChoice(value) {
 function pushMarkDebug(debug, page, prefix, groupResult, choices) {
   Object.entries(groupResult.details).forEach(([choice, result]) => {
     debug.push({
+      kind: "mark",
       page,
       label: `${prefix}: ${prettifyChoice(choice)}`,
       region: choices[choice],
@@ -106,14 +107,14 @@ export async function extractForms(page1Canvas, page2Canvas, onProgress = () => 
     const signatureRegion = PAGE2_TEMPLATE.consent.signature;
     const signatureInk = extraInkRatio(page2Canvas, page2Blank, signatureRegion);
     consent.signaturePresent = signatureInk >= 0.006 ? "Yes" : signatureInk <= 0.0015 ? "No" : "Needs Review";
-    debug.push({ page: 2, label: "Guardian signature", region: signatureRegion, result: consent.signaturePresent, confidence: Math.min(100, Math.round(Math.abs(signatureInk - 0.0035) * 25000)), inkRatio: signatureInk });
+    debug.push({ kind: "signature", page: 2, label: "Guardian signature", region: signatureRegion, result: consent.signaturePresent, confidence: Math.min(100, Math.round(Math.abs(signatureInk - 0.0035) * 25000)), inkRatio: signatureInk });
     tick("Checked guardian signature");
 
     const parentResponse = {};
     for (const [field, region] of Object.entries(PAGE2_TEMPLATE.parentResponse)) {
       const detection = detectMark(page2Canvas, page2Blank, region);
       parentResponse[field] = detection.state === "selected" ? true : detection.state === "not-selected" ? false : null;
-      debug.push({ page: 2, label: `Parent response ${field}`, region, result: detection.state, confidence: Math.min(100, Math.round(Math.abs(detection.ratio - 0.008) * 7000)), inkRatio: detection.ratio });
+      debug.push({ kind: "mark", page: 2, label: `Parent response ${field}`, region, result: detection.state, confidence: Math.min(100, Math.round(Math.abs(detection.ratio - 0.008) * 7000)), inkRatio: detection.ratio });
       tick(`Checked parent response ${field}`);
     }
 
@@ -124,6 +125,10 @@ export async function extractForms(page1Canvas, page2Canvas, onProgress = () => 
       tick(`Read office ${field}`);
     }
 
+    const ocrWarnings = debug
+      .filter((item) => item.kind === "ocr" && item.result && item.confidence < 55)
+      .map((item) => ({ label: item.label, confidence: Math.round(item.confidence) }));
+
     return {
       version: 1,
       extractedAt: new Date().toISOString(),
@@ -132,6 +137,7 @@ export async function extractForms(page1Canvas, page2Canvas, onProgress = () => 
       consent,
       parentResponse,
       office,
+      ocrWarnings,
       debug,
     };
   } finally {
