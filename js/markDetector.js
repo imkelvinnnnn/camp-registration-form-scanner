@@ -66,6 +66,11 @@ export function detectMark(photoCanvas, blankCanvas, region) {
   const blank = cropCanvas(blankCanvas, region);
   const photoData = photo.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, photo.width, photo.height).data;
   const blankData = blank.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, blank.width, blank.height).data;
+
+  const inkThreshold = Math.max(
+    75,
+    Math.min(175, medianLuminance(photoData) - 35),
+  );
   const marginX = Math.max(3, Math.round(photo.width * 0.22));
   const marginY = Math.max(3, Math.round(photo.height * 0.22));
   let ink = 0;
